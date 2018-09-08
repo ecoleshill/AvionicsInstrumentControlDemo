@@ -107,7 +107,7 @@
             this.trackBarHeading.Size = new System.Drawing.Size(194, 45);
             this.trackBarHeading.TabIndex = 14;
             this.trackBarHeading.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarHeading.Scroll += new System.EventHandler(this.trackBarHeading_Scroll);
+            //this.trackBarHeading.Scroll += new System.EventHandler(this.trackBarHeading_Scroll);
             // 
             // label7
             // 
@@ -129,7 +129,7 @@
             this.trackBarVerticalSpeed.TabIndex = 12;
             this.trackBarVerticalSpeed.TickFrequency = 100;
             this.trackBarVerticalSpeed.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarVerticalSpeed.Scroll += new System.EventHandler(this.trackBarVerticalSpeed_Scroll);
+            //this.trackBarVerticalSpeed.Scroll += new System.EventHandler(this.trackBarVerticalSpeed_Scroll);
             // 
             // label6
             // 
@@ -190,7 +190,7 @@
             this.trackBarTurnQuality.Size = new System.Drawing.Size(194, 45);
             this.trackBarTurnQuality.TabIndex = 6;
             this.trackBarTurnQuality.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarTurnQuality.Scroll += new System.EventHandler(this.trackBarTurnQuality_Scroll);
+            //this.trackBarTurnQuality.Scroll += new System.EventHandler(this.trackBarTurnQuality_Scroll);
             // 
             // trackBarTurnRate
             // 
@@ -201,7 +201,7 @@
             this.trackBarTurnRate.Size = new System.Drawing.Size(201, 45);
             this.trackBarTurnRate.TabIndex = 5;
             this.trackBarTurnRate.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarTurnRate.Scroll += new System.EventHandler(this.trackBarTurnRate_Scroll);
+            //this.trackBarTurnRate.Scroll += new System.EventHandler(this.trackBarTurnRate_Scroll);
             // 
             // trackBarAltitude
             // 
@@ -212,7 +212,7 @@
             this.trackBarAltitude.TabIndex = 4;
             this.trackBarAltitude.TickFrequency = 50;
             this.trackBarAltitude.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarAltitude.Scroll += new System.EventHandler(this.trackBarAltitude_Scroll);
+            //this.trackBarAltitude.Scroll += new System.EventHandler(this.trackBarAltitude_Scroll);
             // 
             // trackBarRollAngle
             // 
@@ -223,7 +223,7 @@
             this.trackBarRollAngle.Size = new System.Drawing.Size(194, 45);
             this.trackBarRollAngle.TabIndex = 3;
             this.trackBarRollAngle.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarRollAngle.Scroll += new System.EventHandler(this.trackBarRollAngle_Scroll);
+            //this.trackBarRollAngle.Scroll += new System.EventHandler(this.trackBarRollAngle_Scroll);
             // 
             // trackPitchAngle
             // 
@@ -234,7 +234,7 @@
             this.trackPitchAngle.Size = new System.Drawing.Size(201, 45);
             this.trackPitchAngle.TabIndex = 2;
             this.trackPitchAngle.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackPitchAngle.Scroll += new System.EventHandler(this.trackPitchAngle_Scroll);
+            //this.trackPitchAngle.Scroll += new System.EventHandler(this.trackPitchAngle_Scroll);
             // 
             // label1
             // 
@@ -255,7 +255,7 @@
             this.trackBarAirSpeed.TabIndex = 0;
             this.trackBarAirSpeed.TickFrequency = 10;
             this.trackBarAirSpeed.TickStyle = System.Windows.Forms.TickStyle.Both;
-            this.trackBarAirSpeed.Scroll += new System.EventHandler(this.trackBarAirSpeed_Scroll);
+            //this.trackBarAirSpeed.Scroll += new System.EventHandler(this.trackBarAirSpeed_Scroll);
             // 
             // verticalSpeedInstrumentControl1
             // 

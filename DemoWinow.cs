@@ -21,9 +21,35 @@ using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace AvionicsInstrumentControlDemo
 {
+    public struct Telemetry
+    {
+        public float Alt;              //Altitude
+        public float Pitch;            //Additude Indicator Pitch angle
+        public float Bank;             //Additude Indicator Bank angle
+        public float VS;               //Vertical Speed
+        public float TC_Rate;          //Turn Coordinator - Rate of Turn
+        public float TC_Yaw;           //Turn Coordinator - Yaw
+        public float IAS;              //Indicated Airspeed
+        public float Heading;          //Heading Indicator
+        public char Terminate;         //Termination Flag
+
+        public Telemetry(int vAlt)
+        {
+            Alt = 0;
+            Pitch = 0;
+            Bank = 0;
+            VS = 0;
+            TC_Rate = 0;
+            TC_Yaw = 0;
+            IAS = 0;
+            Heading = 0;
+            Terminate = (char)0x00;
+        }
+    }
     public partial class DemoWinow : Form
     {
         public static string data = null;
@@ -39,9 +65,31 @@ namespace AvionicsInstrumentControlDemo
             airSpeedInstrumentControl1.SetAirSpeedIndicatorParameters(trackBarAirSpeed.Value);
         }
 
+        private void SetIAS(float value)
+        {
+            if (airSpeedInstrumentControl1.InvokeRequired)
+                airSpeedInstrumentControl1.Invoke((MethodInvoker)delegate ()
+                {
+                    SetIAS(value);
+                });
+            else
+                airSpeedInstrumentControl1.SetAirSpeedIndicatorParameters((int)value);
+        }
+
         private void trackBarVerticalSpeed_Scroll(object sender, EventArgs e)
         {
             verticalSpeedInstrumentControl1.SetVerticalSpeedIndicatorParameters(trackBarVerticalSpeed.Value);
+        }
+
+        private void SetVS(float value)
+        {
+            if (verticalSpeedInstrumentControl1.InvokeRequired)
+                verticalSpeedInstrumentControl1.Invoke((MethodInvoker)delegate ()
+                {
+                    SetVS(value);
+                });
+            else
+                verticalSpeedInstrumentControl1.SetVerticalSpeedIndicatorParameters((int)value);
         }
 
         private void trackPitchAngle_Scroll(object sender, EventArgs e)
@@ -54,25 +102,47 @@ namespace AvionicsInstrumentControlDemo
             horizonInstrumentControl1.SetAttitudeIndicatorParameters(trackPitchAngle.Value, trackBarRollAngle.Value);
         }
 
+        private void SetAttitude(float Pitch, float Roll)
+        {
+            if (horizonInstrumentControl1.InvokeRequired)
+                horizonInstrumentControl1.Invoke((MethodInvoker)delegate ()
+                {
+                    SetAttitude(Pitch, Roll);
+                });
+            else
+                horizonInstrumentControl1.SetAttitudeIndicatorParameters((int)Pitch*-1, (int)Roll*-1);
+        }
+
         private void trackBarAltitude_Scroll(object sender, EventArgs e)
         {
             altimeterInstrumentControl1.SetAlimeterParameters(trackBarAltitude.Value);
         }
 
-        private void IncreaseAlt()
+        private void SetAlt(float value)
         {
             if (altimeterInstrumentControl1.InvokeRequired)
                 altimeterInstrumentControl1.Invoke((MethodInvoker)delegate ()
                 {
-                    IncreaseAlt();
+                    SetAlt(value);
                 });
             else
-                altimeterInstrumentControl1.SetAlimeterParameters(3000);
+                altimeterInstrumentControl1.SetAlimeterParameters((int)value);
         }
 
         private void trackBarHeading_Scroll(object sender, EventArgs e)
         {
             headingIndicatorInstrumentControl1.SetHeadingIndicatorParameters(trackBarHeading.Value);
+        }
+
+        private void SetHeading(float value)
+        {
+            if (headingIndicatorInstrumentControl1.InvokeRequired)
+                headingIndicatorInstrumentControl1.Invoke((MethodInvoker)delegate ()
+                {
+                    SetHeading(value);
+                });
+            else
+                headingIndicatorInstrumentControl1.SetHeadingIndicatorParameters((int)value);
         }
 
         private void trackBarTurnRate_Scroll(object sender, EventArgs e)
@@ -85,16 +155,24 @@ namespace AvionicsInstrumentControlDemo
             turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters((trackBarTurnRate.Value / 10), trackBarTurnQuality.Value);
         }
 
+        private void SetTC(float Rate, float Yaw)
+        {
+            if (turnCoordinatorInstrumentControl1.InvokeRequired)
+                turnCoordinatorInstrumentControl1.Invoke((MethodInvoker)delegate ()
+                {
+                    SetTC(Rate, Yaw);
+                });
+            else
+                turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters((int)Rate / 10, (int)Yaw);
+        }
+
         private void threadLogic(AvionicsInstrumentControlDemo.DemoWinow t)
         {
             // Data buffer for incoming data.  
             byte[] bytes = new Byte[1024];
 
             // Establish the local endpoint for the socket.  
-            // Dns.GetHostName returns the name of the   
-            // host running the application.  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[5];
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
             // Create a TCP/IP socket.  
@@ -112,7 +190,31 @@ namespace AvionicsInstrumentControlDemo
                 // Program is suspended while waiting for an incoming connection.  
                 handler = listener.Accept();
 
-                t.IncreaseAlt();
+                // An incoming connection needs to be processed.  
+                bool bRun = true;
+                while (bRun)
+                 {
+                    Telemetry RxT;
+                    
+                    int bytesRec = handler.Receive(bytes);
+                    if (bytesRec > 0)
+                    {
+                        GCHandle handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
+                        RxT = (Telemetry)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(Telemetry));
+
+                        //Set all the GUI displays based on the telemetry that has been received
+                        t.SetAlt(RxT.Alt);
+                        t.SetAttitude(RxT.Pitch, RxT.Bank);
+                        t.SetVS(RxT.VS);
+                        t.SetTC(RxT.TC_Rate, RxT.TC_Yaw);
+                        t.SetIAS(RxT.IAS);
+                        t.SetHeading(RxT.Heading);
+                        
+                        if (RxT.Terminate == 0xFF)
+                            bRun = false;
+                    }
+                 }
+                handler.Disconnect(false);   //Disconnect the TCP/IP Interface and let the thread terminate
             }
             catch (Exception except)
             {
@@ -120,36 +222,14 @@ namespace AvionicsInstrumentControlDemo
             }
         }
 
+        //This button click starts the socket communications thread for dyanmic real-time
+        //control of the GUI displays
         private void button1_Click(object sender, EventArgs e)
         {
             System.Threading.Thread socketThread;
 
             socketThread = new Thread(() => threadLogic(this));
             socketThread.Start();
-
-            /*
-            // An incoming connection needs to be processed.  
-            while (true)
-             {
-                 int bytesRec = handler.Receive(bytes);
-                 data += Encoding.ASCII.GetString(bytes, 0, bytesRec);
-                 if (data.IndexOf("<EOF>") > -1)
-                 {
-                     break;
-                 }
-             }
-
-           
-            // Show the data on the console.  
-            Console.WriteLine("Text received : {0}", data);
-
-            // Echo the data back to the client.  
-            byte[] msg = Encoding.ASCII.GetBytes(data);
-
-            handler.Send(msg);
-            handler.Shutdown(SocketShutdown.Both);
-            handler.Close();
-            */
         }
     }
 }
