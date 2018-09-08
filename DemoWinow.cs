@@ -35,7 +35,7 @@ namespace AvionicsInstrumentControlDemo
         public float TC_Yaw;           //Turn Coordinator - Yaw
         public float IAS;              //Indicated Airspeed
         public float Heading;          //Heading Indicator
-        public char Terminate;         //Termination Flag
+        public int Terminate;         //Termination Flag
 
         public Telemetry(int vAlt)
         {
@@ -47,9 +47,10 @@ namespace AvionicsInstrumentControlDemo
             TC_Yaw = 0;
             IAS = 0;
             Heading = 0;
-            Terminate = (char)0x00;
+            Terminate = 0;
         }
     }
+
     public partial class DemoWinow : Form
     {
         public static string data = null;
@@ -58,11 +59,6 @@ namespace AvionicsInstrumentControlDemo
         public DemoWinow()
         { 
             InitializeComponent();
-        }
-
-        private void trackBarAirSpeed_Scroll(object sender, EventArgs e)
-        {
-            airSpeedInstrumentControl1.SetAirSpeedIndicatorParameters(trackBarAirSpeed.Value);
         }
 
         private void SetIAS(float value)
@@ -76,11 +72,6 @@ namespace AvionicsInstrumentControlDemo
                 airSpeedInstrumentControl1.SetAirSpeedIndicatorParameters((int)value);
         }
 
-        private void trackBarVerticalSpeed_Scroll(object sender, EventArgs e)
-        {
-            verticalSpeedInstrumentControl1.SetVerticalSpeedIndicatorParameters(trackBarVerticalSpeed.Value);
-        }
-
         private void SetVS(float value)
         {
             if (verticalSpeedInstrumentControl1.InvokeRequired)
@@ -90,16 +81,6 @@ namespace AvionicsInstrumentControlDemo
                 });
             else
                 verticalSpeedInstrumentControl1.SetVerticalSpeedIndicatorParameters((int)value);
-        }
-
-        private void trackPitchAngle_Scroll(object sender, EventArgs e)
-        {
-            horizonInstrumentControl1.SetAttitudeIndicatorParameters(trackPitchAngle.Value, trackBarRollAngle.Value);
-        }
-
-        private void trackBarRollAngle_Scroll(object sender, EventArgs e)
-        {
-            horizonInstrumentControl1.SetAttitudeIndicatorParameters(trackPitchAngle.Value, trackBarRollAngle.Value);
         }
 
         private void SetAttitude(float Pitch, float Roll)
@@ -113,11 +94,6 @@ namespace AvionicsInstrumentControlDemo
                 horizonInstrumentControl1.SetAttitudeIndicatorParameters((int)Pitch*-1, (int)Roll*-1);
         }
 
-        private void trackBarAltitude_Scroll(object sender, EventArgs e)
-        {
-            altimeterInstrumentControl1.SetAlimeterParameters(trackBarAltitude.Value);
-        }
-
         private void SetAlt(float value)
         {
             if (altimeterInstrumentControl1.InvokeRequired)
@@ -127,11 +103,6 @@ namespace AvionicsInstrumentControlDemo
                 });
             else
                 altimeterInstrumentControl1.SetAlimeterParameters((int)value);
-        }
-
-        private void trackBarHeading_Scroll(object sender, EventArgs e)
-        {
-            headingIndicatorInstrumentControl1.SetHeadingIndicatorParameters(trackBarHeading.Value);
         }
 
         private void SetHeading(float value)
@@ -145,16 +116,6 @@ namespace AvionicsInstrumentControlDemo
                 headingIndicatorInstrumentControl1.SetHeadingIndicatorParameters((int)value);
         }
 
-        private void trackBarTurnRate_Scroll(object sender, EventArgs e)
-        {
-            turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters((trackBarTurnRate.Value / 10), trackBarTurnQuality.Value);
-        }
-
-        private void trackBarTurnQuality_Scroll(object sender, EventArgs e)
-        {
-            turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters((trackBarTurnRate.Value / 10), trackBarTurnQuality.Value);
-        }
-
         private void SetTC(float Rate, float Yaw)
         {
             if (turnCoordinatorInstrumentControl1.InvokeRequired)
@@ -163,7 +124,7 @@ namespace AvionicsInstrumentControlDemo
                     SetTC(Rate, Yaw);
                 });
             else
-                turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters((int)Rate / 10, (int)Yaw);
+                turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters(((int)Rate / 10)*-1, (int)Yaw);
         }
 
         private void threadLogic(AvionicsInstrumentControlDemo.DemoWinow t)
@@ -209,8 +170,8 @@ namespace AvionicsInstrumentControlDemo
                         t.SetTC(RxT.TC_Rate, RxT.TC_Yaw);
                         t.SetIAS(RxT.IAS);
                         t.SetHeading(RxT.Heading);
-                        
-                        if (RxT.Terminate == 0xFF)
+
+                        if (RxT.Terminate == 5)
                             bRun = false;
                     }
                  }
