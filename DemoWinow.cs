@@ -124,7 +124,7 @@ namespace AvionicsInstrumentControlDemo
                     SetTC(Rate, Yaw);
                 });
             else
-                turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters(((int)Rate / 10)*-1, (int)Yaw);
+                turnCoordinatorInstrumentControl1.SetTurnCoordinatorParameters((Rate / 10)*-1, Yaw);
         }
 
         private void threadLogic(AvionicsInstrumentControlDemo.DemoWinow t)
