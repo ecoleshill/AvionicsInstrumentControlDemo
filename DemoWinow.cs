@@ -55,6 +55,8 @@ namespace AvionicsInstrumentControlDemo
     {
         public static string data = null;
         public static Socket handler = null;
+        System.Threading.Thread socketThread;
+        bool bTerminate = false;
 
         public DemoWinow()
         { 
@@ -153,7 +155,7 @@ namespace AvionicsInstrumentControlDemo
 
                 // An incoming connection needs to be processed.  
                 bool bRun = true;
-                while (bRun)
+                while ((bRun) && (!bTerminate))
                  {
                     Telemetry RxT;
                     
@@ -187,10 +189,15 @@ namespace AvionicsInstrumentControlDemo
         //control of the GUI displays
         private void button1_Click(object sender, EventArgs e)
         {
-            System.Threading.Thread socketThread;
-
+            bTerminate = false;
             socketThread = new Thread(() => threadLogic(this));
             socketThread.Start();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            bTerminate = true;
+            Application.Exit();
         }
     }
 }
